@@ -3,19 +3,428 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lottery Profit Calculator</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>YouTube Earnings Distribution Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .channels {
+            background-color: #f5f7fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .channel {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .channel:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .channel-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        
+        .calculate-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .calculate-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .info {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+        
+        /* Earnings Slip Styles */
+        .earnings-slip {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #fff;
+        }
+        
+        .slip-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .slip-title {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .slip-date {
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+        
+        .slip-section {
+            margin-bottom: 30px;
+        }
+        
+        .slip-section-title {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .slip-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .slip-table th, .slip-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .slip-table th {
+            background-color: #f5f7fa;
+            font-weight: 600;
+        }
+        
+        .slip-total {
+            font-weight: 600;
+            font-size: 18px;
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        .slip-footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .print-btn {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .print-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        @media print {
+            .print-btn {
+                display: none;
+            }
+            
+            body {
+                background-color: #fff;
+            }
+            
+            .earnings-slip {
+                box-shadow: none;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Lottery Profit Calculator</h1>
-    <p>Har number ki sales input karein:</p>
-    <ul id="salesList"></ul>
-    <button id="addNumber">+ Add Number</button>
-    <br>
-    <button id="calculate">Calculate Profit</button>
-    <div id="result"></div>
-    <canvas id="profitChart"></canvas>
+    <div class="container">
+        <h1>YouTube Earnings Distribution Calculator</h1>
+        
+        <form id="earningsForm">
+            <div class="form-group">
+                <label for="month">Which month's earnings do you want to calculate?</label>
+                <input type="text" id="month" name="month" placeholder="e.g., January 2025">
+            </div>
+            
+            <div class="form-group">
+                <label for="totalEarnings">How much total earnings (USD) did Google send?</label>
+                <input type="number" id="totalEarnings" name="totalEarnings" placeholder="e.g., 5000" step="0.01">
+            </div>
+            
+            <div class="channels">
+                <div class="channel">
+                    <div class="channel-title">AMC Daily</div>
+                    <div class="form-group">
+                        <label for="amcEarnings">How much did AMC Daily earn? (USD)</label>
+                        <input type="number" id="amcEarnings" name="amcEarnings" placeholder="e.g., 2000" step="0.01">
+                        <div class="info">Distribution: Zarar Ahmed (33.33%), Rajab (33.33%), Muhammad Khan (33.33%)</div>
+                    </div>
+                </div>
+                
+                <div class="channel">
+                    <div class="channel-title">Whiteboard Crypto Update</div>
+                    <div class="form-group">
+                        <label for="cryptoEarnings">How much did Whiteboard Crypto Update earn? (USD)</label>
+                        <input type="number" id="cryptoEarnings" name="cryptoEarnings" placeholder="e.g., 1500" step="0.01">
+                        <div class="info">Distribution: Zarar Ahmed (50%), Muhammad Khan (50%)</div>
+                    </div>
+                </div>
+                
+                <div class="channel">
+                    <div class="channel-title">Daily Stock Update</div>
+                    <div class="form-group">
+                        <label for="stockEarnings">How much did Daily Stock Update earn? (USD)</label>
+                        <input type="number" id="stockEarnings" name="stockEarnings" placeholder="e.g., 1500" step="0.01">
+                        <div class="info">Distribution: Zarar Ahmed (40%), Rajab (20%), Muhammad Khan (40%)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="exchangeRate">What was the exchange rate (USD to PKR)?</label>
+                <input type="number" id="exchangeRate" name="exchangeRate" placeholder="e.g., 280" step="0.01">
+            </div>
+            
+            <button type="button" class="calculate-btn" id="calculateBtn">Calculate Earnings</button>
+        </form>
+    </div>
     
-    <script src="script.js"></script>
-</body>
+    <script>
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            // Validate inputs
+            const month = document.getElementById('month').value.trim();
+            const totalEarningsInput = document.getElementById('totalEarnings').value.trim();
+            const amcEarningsInput = document.getElementById('amcEarnings').value.trim();
+            const cryptoEarningsInput = document.getElementById('cryptoEarnings').value.trim();
+            const stockEarningsInput = document.getElementById('stockEarnings').value.trim();
+            const exchangeRateInput = document.getElementById('exchangeRate').value.trim();
+            
+            // Check if all fields are filled
+            if (!month || !totalEarningsInput || !amcEarningsInput || !cryptoEarningsInput || !stockEarningsInput || !exchangeRateInput) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Convert inputs to numbers
+            const totalEarnings = parseFloat(totalEarningsInput);
+            const amcEarnings = parseFloat(amcEarningsInput);
+            const cryptoEarnings = parseFloat(cryptoEarningsInput);
+            const stockEarnings = parseFloat(stockEarningsInput);
+            const exchangeRate = parseFloat(exchangeRateInput);
+            
+            // Validate numeric inputs
+            if (isNaN(totalEarnings) || isNaN(amcEarnings) || isNaN(cryptoEarnings) || isNaN(stockEarnings) || isNaN(exchangeRate)) {
+                alert('Please enter valid numbers for earnings and exchange rate');
+                return;
+            }
+            
+            // Validate positive numbers
+            if (totalEarnings <= 0 || amcEarnings < 0 || cryptoEarnings < 0 || stockEarnings < 0 || exchangeRate <= 0) {
+                alert('Please enter positive numbers for earnings and exchange rate');
+                return;
+            }
+            
+            // Validate sum of channel earnings
+            const channelSum = amcEarnings + cryptoEarnings + stockEarnings;
+            if (Math.abs(channelSum - totalEarnings) > 0.01) {
+                alert('The sum of channel earnings must equal the total earnings from Google');
+                return;
+            }
+            
+            // Calculate earnings for each person
+            const zararAMC = amcEarnings * 0.3333;
+            const rajabAMC = amcEarnings * 0.3333;
+            const muhammadAMC = amcEarnings * 0.3333;
+            
+            const zararCrypto = cryptoEarnings * 0.5;
+            const muhammadCrypto = cryptoEarnings * 0.5;
+            
+            const zararStock = stockEarnings * 0.4;
+            const rajabStock = stockEarnings * 0.2;
+            const muhammadStock = stockEarnings * 0.4;
+            
+            // Calculate total earnings for each person
+            const zararTotal = zararAMC + zararCrypto + zararStock;
+            const rajabTotal = rajabAMC + rajabStock;
+            const muhammadTotal = muhammadAMC + muhammadCrypto + muhammadStock;
+            
+            // Convert to PKR
+            const zararTotalPKR = zararTotal * exchangeRate;
+            const rajabTotalPKR = rajabTotal * exchangeRate;
+            const muhammadTotalPKR = muhammadTotal * exchangeRate;
+            
+            // Create a new window for the earnings slip
+            const slipWindow = window.open('', '_blank');
+            
+            // Generate the earnings slip content
+            slipWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>YouTube Earnings Slip - ${month}</title>
+                    <style>
+                        * {
+                            box-sizing: border-box;
+                            margin: 0;
+                            padding: 0;
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        }
+                        
+                        body {
+                            background-color: #f9f9f9;
+                            color: #333;
+                            line-height: 1.6;
+                            padding: 20px;
+                        }
+                        
+                        .earnings-slip {
+                            max-width: 800px;
+                            margin: 0 auto;
+                            background-color: #fff;
+                            padding: 40px;
+                            border-radius: 10px;
+                            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+                        }
+                        
+                        .slip-header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                        }
+                        
+                        .slip-title {
+                            font-size: 28px;
+                            color: #2c3e50;
+                            margin-bottom: 10px;
+                        }
+                        
+                        .slip-date {
+                            font-size: 16px;
+                            color: #7f8c8d;
+                        }
+                        
+                        .slip-section {
+                            margin-bottom: 30px;
+                        }
+                        
+                        .slip-section-title {
+                            font-size: 20px;
+                            color: #2c3e50;
+                            margin-bottom: 15px;
+                            padding-bottom: 5px;
+                            border-bottom: 1px solid #eee;
+                        }
+                        
+                        .slip-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 20px;
+                        }
+                        
+                        .slip-table th, .slip-table td {
+                            padding: 12px;
+                            text-align: left;
+                            border-bottom: 1px solid #eee;
+                        }
+                        
+                        .slip-table th {
+                            background-color: #f5f7fa;
+                            font-weight: 600;
+                        }
+                        
+                        .slip-total {
+                            font-weight: 600;
+                            font-size: 18
